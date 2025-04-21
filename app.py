@@ -117,6 +117,7 @@ else:
         showlegend=False,
         margin=dict(l=10, r=10, t=30, b=10)
     )
+    fig_team.update_coloraxes(showscale=False)
     st.plotly_chart(fig_team, use_container_width=True)
 
 #Individual Leaderboard: Top 10 Individuals
@@ -162,6 +163,7 @@ else:
         showlegend=False,
         margin=dict(l=10, r=10, t=30, b=10)
     )
+    fig_runner.update_coloraxes(showscale=False)
     st.plotly_chart(fig_runner, use_container_width=True)
 
 st.caption("Tip: For best experience on mobile, add this page to your home screen!")
