@@ -12,7 +12,7 @@ st.markdown("""
       crossorigin="anonymous">
 """, unsafe_allow_html=True)
 
-# --- Hardcoded team-member mapping ---
+#Hardcoded team-member mapping
 team_member_map = {
     "Team A": ["Asim", "Ijaz", "Jaskeat"],
     "Team B": ["Alfred", "Angelo", "Miho"],
@@ -30,7 +30,7 @@ def load_data():
     data = conn.read()
     df = pd.DataFrame(data)
     df['Distance'] = pd.to_numeric(df['Distance']).round(2)
-    df['Date'] = pd.to_datetime(df['Date']).dt.date  # Only date, no time
+    df['Date'] = pd.to_datetime(df['Date']).dt.date  
     return df
 
 df = load_data()
@@ -50,7 +50,7 @@ team_stats['Pos'] = ''
 for i in range(len(team_stats)):
     team_stats.loc[i, 'Pos'] = medals[i] if i < 3 else str(i+1)
 
-# --- Build TeamDisplay column with members underneath ---
+# Build TeamDisplay column with members underneath
 def team_with_members(team):
     members = ", ".join(team_member_map.get(team, []))
     return f"""
@@ -62,7 +62,7 @@ def team_with_members(team):
 
 team_stats["TeamDisplay"] = team_stats["Team"].apply(team_with_members)
 
-# --- Render Bootstrap dark table ---
+#Render Bootstrap dark table
 def render_bootstrap_dark_table(df, columns, headers):
     html = """
     <table class="table table-dark table-striped table-hover align-middle" data-bs-theme="dark" style="border-radius: 0.5em; overflow: hidden;">
@@ -82,11 +82,11 @@ def render_bootstrap_dark_table(df, columns, headers):
 
 st.title("Leaderboard")
 
-# --- REFRESH BUTTON ---
+#REFRESH BUTTON
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
 
-# --- Team Leaderboard: Toggle Table/Bar Chart ---
+#Team Leaderboard: Toggle Table/Bar Chart
 st.subheader("Team Leaderboard")
 team_view = st.radio("View:", ["Table", "Bar Chart"], key="team_view", horizontal=True)
 if team_view == "Table":
@@ -99,7 +99,7 @@ if team_view == "Table":
         unsafe_allow_html=True
     )
 else:
-    # --- TEAM HORIZONTAL BAR CHART ---
+    #TEAM HORIZONTAL BAR CHART
     fig_team = px.bar(
         team_stats.sort_values('Distance', ascending=True),  # Smallest at bottom
         x='Distance',
@@ -119,7 +119,7 @@ else:
     )
     st.plotly_chart(fig_team, use_container_width=True)
 
-# --- Individual Leaderboard: Top 10 Individuals ---
+#Individual Leaderboard: Top 10 Individuals
 st.subheader("Top 10 Individuals")
 runner_stats = (
     df.groupby('Runner', as_index=False)['Distance']
@@ -144,7 +144,7 @@ if indiv_view == "Table":
         unsafe_allow_html=True
     )
 else:
-    # --- INDIVIDUAL HORIZONTAL BAR CHART ---
+    #INDIVIDUAL HORIZONTAL BAR CHART
     fig_runner = px.bar(
         runner_stats.sort_values('Distance', ascending=True),
         x='Distance',
