@@ -33,8 +33,6 @@ def load_data():
     df['Date'] = pd.to_datetime(df['Date']).dt.date  # Only date, no time
     return df
 
-
-
 df = load_data()
 
 # Team leaderboard (all teams, sum across all dates)
@@ -88,9 +86,9 @@ st.title("Leaderboard")
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
 
-# --- Team Leaderboard: Toggle Table/Chart ---
+# --- Team Leaderboard: Toggle Table/Bar Chart ---
 st.subheader("Team Leaderboard")
-team_view = st.radio("View:", ["Table", "Chart"], key="team_view", horizontal=True)
+team_view = st.radio("View:", ["Table", "Bar Chart"], key="team_view", horizontal=True)
 if team_view == "Table":
     st.markdown(
         render_bootstrap_dark_table(
@@ -101,25 +99,23 @@ if team_view == "Table":
         unsafe_allow_html=True
     )
 else:
-    team_time_series = (
-        df.groupby(['Date', 'Team'])['Distance']
-        .sum()
-        .unstack(fill_value=0)
-        .cumsum()
+    # --- TEAM HORIZONTAL BAR CHART ---
+    fig_team = px.bar(
+        team_stats.sort_values('Distance', ascending=True),  # Smallest at bottom
+        x='Distance',
+        y='Team',
+        orientation='h',
+        text='Distance',
+        color='Distance',
+        color_continuous_scale='viridis',
+        labels={'Distance': 'Total Distance (km)', 'Team': 'Team'},
+        title='Team Leaderboard'
     )
-    team_time_series.index = [d.strftime("%m/%d") for d in team_time_series.index]
-    fig_team = px.line(
-        team_time_series,
-        labels={'value': 'Cumulative Distance (km)', 'index': 'Date', 'variable': 'Team'},
-        title=None,
-        markers=True
-    )
-    fig_team.update_traces(mode="lines+markers", marker=dict(size=8))
+    fig_team.update_traces(texttemplate='%{text:.2f}', textposition='outside')
     fig_team.update_layout(
-        legend_title_text='Team',
-        hovermode='x unified',
-        margin=dict(l=10, r=10, t=10, b=10),
-        yaxis=dict(range=[0, team_time_series.values.max()])
+        yaxis={'categoryorder':'total ascending'},
+        showlegend=False,
+        margin=dict(l=10, r=10, t=30, b=10)
     )
     st.plotly_chart(fig_team, use_container_width=True)
 
@@ -130,14 +126,14 @@ runner_stats = (
     .sum()
     .sort_values(by='Distance', ascending=False)
     .reset_index(drop=True)
-    .head(10)  # Changed from 5 to 10
+    .head(10)
 )
 runner_stats['Distance'] = runner_stats['Distance'].round(2)
 runner_stats['Pos'] = ''
 for i in range(len(runner_stats)):
     runner_stats.loc[i, 'Pos'] = medals[i] if i < 3 else str(i+1)
 
-indiv_view = st.radio("View:", ["Table", "Chart"], key="indiv_view", horizontal=True)
+indiv_view = st.radio("View:", ["Table", "Bar Chart"], key="indiv_view", horizontal=True)
 if indiv_view == "Table":
     st.markdown(
         render_bootstrap_dark_table(
@@ -148,29 +144,24 @@ if indiv_view == "Table":
         unsafe_allow_html=True
     )
 else:
-    top_names = runner_stats['Runner'].tolist()
-    runner_time_series = (
-        df[df['Runner'].isin(top_names)]
-        .groupby(['Date', 'Runner'])['Distance']
-        .sum()
-        .unstack(fill_value=0)
-        .cumsum()
+    # --- INDIVIDUAL HORIZONTAL BAR CHART ---
+    fig_runner = px.bar(
+        runner_stats.sort_values('Distance', ascending=True),
+        x='Distance',
+        y='Runner',
+        orientation='h',
+        text='Distance',
+        color='Distance',
+        color_continuous_scale='plasma',
+        labels={'Distance': 'Total Distance (km)', 'Runner': 'Runner'},
+        title='Top 10 Individuals'
     )
-    runner_time_series.index = [d.strftime("%m/%d") for d in runner_time_series.index]
-    fig_runner = px.line(
-        runner_time_series,
-        labels={'value': 'Cumulative Distance (km)', 'index': 'Date', 'variable': 'Runner'},
-        title=None,
-        markers=True
-    )
-    fig_runner.update_traces(mode="lines+markers", marker=dict(size=8))
+    fig_runner.update_traces(texttemplate='%{text:.2f}', textposition='outside')
     fig_runner.update_layout(
-        legend_title_text='Runner',
-        hovermode='x unified',
-        margin=dict(l=10, r=10, t=10, b=10),
-        yaxis=dict(range=[0, runner_time_series.values.max()])
+        yaxis={'categoryorder':'total ascending'},
+        showlegend=False,
+        margin=dict(l=10, r=10, t=30, b=10)
     )
     st.plotly_chart(fig_runner, use_container_width=True)
-
 
 st.caption("Tip: For best experience on mobile, add this page to your home screen!")
