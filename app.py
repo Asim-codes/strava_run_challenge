@@ -3,7 +3,7 @@ from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="🏅 Leaderboard", page_icon="🏅", layout="wide")
+st.set_page_config(page_title="Leaderboard", page_icon="🏅", layout="wide")
 
 # Inject Bootstrap CSS
 st.markdown("""
