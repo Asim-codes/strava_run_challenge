@@ -165,3 +165,5 @@ else:
     st.plotly_chart(fig_runner, use_container_width=True)
 
 st.caption("Tip: For best experience on mobile, add this page to your home screen!")
+st.caption("Android: In Chrome, tap ⋮ > Add to Home screen > Add.")
+st.caption("iPhone: In Safari, tap Share > Add to Home Screen > Add.")
