@@ -2,9 +2,25 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 import plotly.express as px
+from datetime import datetime
 
 st.set_page_config(page_title="Leaderboard", page_icon="🏅", layout="wide")
 
+#Days Left
+current_date = datetime.today() 
+target_date = datetime(2025, 5, 31)
+days_left = (target_date - current_date).days
+
+# Display Days Left segment
+st.markdown(
+    f"""
+    <div style="display:block; text-align:left; margin-bottom:0.5em;">
+        <div style="font-size:2.8em; font-weight:700; color:#FF4B4B; line-height:1;">{days_left}</div>
+        <div style="font-size:1em; color:#555; letter-spacing:0.05em;">days left</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 # Inject Bootstrap CSS
 st.markdown("""
 <link rel="stylesheet"
