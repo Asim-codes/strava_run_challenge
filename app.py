@@ -6,7 +6,7 @@ from datetime import datetime
 
 st.set_page_config(page_title="Leaderboard", page_icon="🏅", layout="wide")
 
-#Days Left
+# Days Left
 current_date = datetime.today() 
 target_date = datetime(2025, 5, 31)
 days_left = (target_date - current_date).days
@@ -28,7 +28,7 @@ st.markdown("""
       crossorigin="anonymous">
 """, unsafe_allow_html=True)
 
-#Hardcoded team-member mapping
+# Hardcoded team-member mapping
 team_member_map = {
     "Team A": ["Asim", "Ijaz", "Jaskeat"],
     "Team B": ["Alfred", "Angelo", "Miho"],
@@ -78,7 +78,7 @@ def team_with_members(team):
 
 team_stats["TeamDisplay"] = team_stats["Team"].apply(team_with_members)
 
-#Render Bootstrap dark table
+# Render Bootstrap dark table
 def render_bootstrap_dark_table(df, columns, headers):
     html = """
     <table class="table table-dark table-striped table-hover align-middle" data-bs-theme="dark" style="border-radius: 0.5em; overflow: hidden;">
@@ -98,13 +98,21 @@ def render_bootstrap_dark_table(df, columns, headers):
 
 st.title("Leaderboard")
 
-#REFRESH BUTTON
+# REFRESH BUTTON
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
 
-#Team Leaderboard: Toggle Table/Bar Chart
+# --- TEAM LEADERBOARD ---
 st.subheader("Team Leaderboard")
-team_view = st.radio("View:", ["Table", "Bar Chart"], key="team_view", horizontal=True)
+
+# NEW: Add "Contribution" to the toggle
+team_view = st.radio(
+    "View:", 
+    ["Table", "Bar Chart", "Contribution"], 
+    key="team_view", 
+    horizontal=True
+)
+
 if team_view == "Table":
     st.markdown(
         render_bootstrap_dark_table(
@@ -114,10 +122,10 @@ if team_view == "Table":
         ),
         unsafe_allow_html=True
     )
-else:
-    #TEAM HORIZONTAL BAR CHART
+elif team_view == "Bar Chart":
+    # TEAM HORIZONTAL BAR CHART
     fig_team = px.bar(
-        team_stats.sort_values('Distance', ascending=True),  # Smallest at bottom
+        team_stats.sort_values('Distance', ascending=True),
         x='Distance',
         y='Team',
         orientation='h',
@@ -135,8 +143,44 @@ else:
     )
     fig_team.update_coloraxes(showscale=False)
     st.plotly_chart(fig_team, use_container_width=True)
+elif team_view == "Contribution":
+    # --- NEW: STARBURST CHART FOR TEAM MEMBER CONTRIBUTIONS ---
+    team_list = list(team_member_map.keys())
+    selected_team = st.selectbox("Select a team to see member contributions:", team_list)
+    # Filter data for the selected team
+    df_team = df[df['Team'] == selected_team]
+    # Group by member
+    member_contrib = df_team.groupby('Runner')['Distance'].sum().reset_index()
+    member_contrib['Distance'] = member_contrib['Distance'].round(2)
+    # Prepare data for sunburst: root = Team, children = Members
+    sunburst_df = pd.DataFrame({
+        'Team': [selected_team]*len(member_contrib),
+        'Member': member_contrib['Runner'],
+        'Distance': member_contrib['Distance']
+    })
+    fig_sunburst = px.sunburst(
+        sunburst_df,
+        path=['Team', 'Member'],
+        values='Distance',
+        color='Distance',
+        color_continuous_scale='Viridis',  # Vibrant, perceptually uniform
+        hover_data={'Distance':':.2f'},    # Show distance with 2 decimals on hover
+        title=f"{selected_team} - Member Contribution"
+    )
+    fig_sunburst.update_traces(
+        marker=dict(line=dict(color='white', width=2)),  # White borders between segments
+        textinfo='label+percent entry'                   # Show label and percent
+    )
+    fig_sunburst.update_layout(
+        margin=dict(t=50, l=10, r=10, b=10),
+        uniformtext=dict(minsize=10, mode='hide'),       # Hide text if too small
+        sunburstcolorway=["#636efa", "#ef553b", "#00cc96", "#ab63fa", "#ffa15a", "#19d3f3"],
+        extendsunburstcolors=True
+    )
 
-#Individual Leaderboard: Top 10 Individuals
+    st.plotly_chart(fig_sunburst, use_container_width=True)
+
+# --- INDIVIDUAL LEADERBOARD ---
 st.subheader("Top 10 Individuals")
 runner_stats = (
     df.groupby('Runner', as_index=False)['Distance']
@@ -150,7 +194,14 @@ runner_stats['Pos'] = ''
 for i in range(len(runner_stats)):
     runner_stats.loc[i, 'Pos'] = medals[i] if i < 3 else str(i+1)
 
-indiv_view = st.radio("View:", ["Table", "Bar Chart"], key="indiv_view", horizontal=True)
+# Only keep Table and Bar Chart for individuals
+indiv_view = st.radio(
+    "View:", 
+    ["Table", "Bar Chart"], 
+    key="indiv_view", 
+    horizontal=True
+)
+
 if indiv_view == "Table":
     st.markdown(
         render_bootstrap_dark_table(
@@ -160,8 +211,8 @@ if indiv_view == "Table":
         ),
         unsafe_allow_html=True
     )
-else:
-    #INDIVIDUAL HORIZONTAL BAR CHART
+elif indiv_view == "Bar Chart":
+    # INDIVIDUAL HORIZONTAL BAR CHART
     fig_runner = px.bar(
         runner_stats.sort_values('Distance', ascending=True),
         x='Distance',
