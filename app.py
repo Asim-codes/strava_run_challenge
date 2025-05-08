@@ -35,7 +35,8 @@ team_member_map = {
     "Team C": ["Arminder", "Siddhant", "Yrral"],
     "Team D": ["Gladys", "Jonathan", "Luis"],
     "Team E": ["John", "Rishi", "Timothy"],
-    "Team F": ["Alan", "Anurag", "Matthew"]
+    "Team F": ["Alan", "Anurag", "Matthew"],
+    "Team G": [ "Karebu", "Siddharth", "Sneha"]
 }
 
 # Read data from Google Sheets
