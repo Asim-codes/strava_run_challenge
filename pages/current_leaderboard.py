@@ -345,3 +345,40 @@ elif individual_view == "Bar Chart":
 
 st.markdown("---")
 
+# Add this at the very end of your file, after all the existing code
+
+st.markdown("<br><br>", unsafe_allow_html=True)
+
+# Add to Home Screen Instructions
+st.markdown("""
+---
+<div style="text-align: center; padding: 2rem 1rem; background-color: rgba(255,255,255,0.02); border-radius: 8px; margin-top: 2rem;">
+    <h4 style="color: rgba(255,255,255,0.8); margin-bottom: 1rem;">📱 Add to Home Screen</h4>
+    
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
+        
+        <div style="text-align: left; max-width: 300px;">
+            <h5 style="color: #ff6b6b; margin-bottom: 0.5rem;">🤖 Android</h5>
+            <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.4;">
+                1. Tap the menu (⋮) in your browser<br>
+                2. Select "Add to Home screen"<br>
+                3. Tap "Add" to confirm
+            </p>
+        </div>
+        
+        <div style="text-align: left; max-width: 300px;">
+            <h5 style="color: #ff6b6b; margin-bottom: 0.5rem;">🍎 iPhone</h5>
+            <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.4;">
+                1. Tap the share button (⬆️)<br>
+                2. Scroll down and tap "Add to Home Screen"<br>
+                3. Tap "Add" to confirm
+            </p>
+        </div>
+        
+    </div>
+    
+    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 1.5rem;">
+        Access the leaderboard instantly like a native app!
+    </p>
+</div>
+""", unsafe_allow_html=True)
