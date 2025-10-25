@@ -8,7 +8,7 @@ from datetime import datetime
 
 # Days Left
 current_date = datetime.today() 
-target_date = datetime(2025, 10, 16)
+target_date = datetime(2025, 11, 23)
 days_left = (target_date - current_date).days
 
 
