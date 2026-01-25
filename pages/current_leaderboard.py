@@ -8,7 +8,7 @@ from datetime import datetime
 
 # Days Left
 current_date = datetime.today() 
-target_date = datetime(2025, 11, 23)
+target_date = datetime(2026, 2, 6)
 days_left = (target_date - current_date).days
 
 
@@ -317,7 +317,7 @@ if individual_view == "Table":
         unsafe_allow_html=True
     )
 elif individual_view == "Bar Chart":
-    top_individuals = individual_stats.head(10).sort_values('Distance', ascending=True)
+    top_individuals = individual_stats.head(6).sort_values('Distance', ascending=True)
     fig_individual = px.bar(
         top_individuals,
         x='Distance',
@@ -326,7 +326,7 @@ elif individual_view == "Bar Chart":
         text='Distance',
         color='Team',
         labels={'Distance': 'Total Distance (km)', 'Runner': 'Runner'},
-        title='Top 10 Individual Performers'
+        title='Top 6 Individual Performers'
     )
     fig_individual.update_traces(texttemplate='%{text:.2f}', textposition='outside')
     fig_individual.update_layout(
