@@ -157,7 +157,7 @@ def _build_response(
     timezone = _safe_timezone(challenge_timezone)
     today_hkt = datetime.now(timezone).date()
     frame_hkt = _with_hkt_dates(frame, timezone)
-    teams = _team_standings(frame)
+    teams = _team_standings(frame, frame_hkt, today_hkt)
     individuals = _individual_standings(frame_hkt, today_hkt)
     return CurrentChallengeResponse(
         summary=_summary(frame, challenge_end_date, challenge_timezone),
@@ -187,7 +187,9 @@ def _summary(
     )
 
 
-def _team_standings(frame: pd.DataFrame) -> list[TeamStanding]:
+def _team_standings(
+    frame: pd.DataFrame, frame_hkt: pd.DataFrame, today_hkt: date
+) -> list[TeamStanding]:
     if frame.empty:
         return []
 
@@ -196,18 +198,42 @@ def _team_standings(frame: pd.DataFrame) -> list[TeamStanding]:
         .apply(lambda rows: sorted(set(rows)))
         .to_dict()
     )
+    all_teams = sorted({str(t) for t in frame["Team"].unique()})
+
+    current_month_start = _month_start(today_hkt)
+    current_month_end = _month_end(today_hkt)
+    monthly_by_team: dict[str, float] = {}
+    if not frame_hkt.empty and "DateOnlyHKT" in frame_hkt.columns:
+        fh = frame_hkt[frame_hkt["DateOnlyHKT"].notna()].copy()
+        month_mask = (fh["DateOnlyHKT"] >= current_month_start) & (
+            fh["DateOnlyHKT"] <= current_month_end
+        )
+        monthly = fh[month_mask]
+        if not monthly.empty:
+            monthly_by_team = (
+                monthly.groupby("Team")["Distance"].sum().astype(float).to_dict()
+            )
+
+    rows = [{"Team": t, "Distance": float(monthly_by_team.get(t, 0.0))} for t in all_teams]
     totals = (
-        frame.groupby("Team", as_index=False)["Distance"]
-        .sum()
+        pd.DataFrame(rows)
         .sort_values("Distance", ascending=False)
         .reset_index(drop=True)
     )
-    top_distance = float(totals["Distance"].max()) or 1.0
+    leader_distance = float(totals.iloc[0]["Distance"]) if not totals.empty else 0.0
+    top_distance = leader_distance or 1.0
 
     standings: list[TeamStanding] = []
     for index, row in totals.iterrows():
         team = str(row["Team"])
         distance = round(float(row["Distance"]), 1)
+        this_distance = float(row["Distance"])
+        distance_to_leader = round(leader_distance - this_distance, 1)
+        if index == 0:
+            distance_to_team_above: float | None = None
+        else:
+            prev = float(totals.iloc[index - 1]["Distance"])
+            distance_to_team_above = round(prev - this_distance, 1)
         standings.append(
             TeamStanding(
                 rank=index + 1,
@@ -217,7 +243,9 @@ def _team_standings(frame: pd.DataFrame) -> list[TeamStanding]:
                 member_count=len(members.get(team, [])),
                 runners=members.get(team, []),
                 color=TEAM_COLORS[index % len(TEAM_COLORS)],
-                progress=round((distance / top_distance) * 100, 1),
+                progress=round((this_distance / top_distance) * 100, 1),
+                distance_to_leader=distance_to_leader,
+                distance_to_team_above=distance_to_team_above,
             )
         )
     return standings

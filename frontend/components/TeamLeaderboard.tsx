@@ -12,6 +12,7 @@ export function TeamLeaderboard({ teams }: TeamLeaderboardProps) {
         <div>
           <p className="eyebrow">Team race</p>
           <h2>Leaderboard</h2>
+          <p className="section-sub">Monthly distance (HKT calendar month)</p>
         </div>
         <span>{teams.length} teams</span>
       </div>
@@ -28,7 +29,19 @@ export function TeamLeaderboard({ teams }: TeamLeaderboardProps) {
                   <h3>{team.team}</h3>
                   <p>{team.runners.join(", ")}</p>
                 </div>
-                <strong>{team.distance.toFixed(1)} km</strong>
+                <div className="team-distance-block">
+                  <strong>{team.distance.toFixed(1)} km</strong>
+                  <div className="team-gap-hints">
+                    <span>
+                      {team.distance_to_leader.toFixed(1)} km behind leader
+                    </span>
+                    {team.distance_to_team_above != null && (
+                      <span>
+                        {team.distance_to_team_above.toFixed(1)} km behind next team
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
               <ProgressBar value={team.progress} color={team.color} />
               <div className="ranking-meta">

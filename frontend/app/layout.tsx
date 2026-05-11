@@ -23,6 +23,7 @@ export default function RootLayout({
             <nav aria-label="Main navigation">
               <Link href="/">Current</Link>
               <Link href="/archive">Archive</Link>
+              <Link href="/badges">Badges</Link>
             </nav>
           </header>
           {children}

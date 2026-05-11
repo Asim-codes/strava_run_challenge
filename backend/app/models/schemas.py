@@ -19,6 +19,8 @@ class TeamStanding(BaseModel):
     runners: list[str]
     color: str
     progress: float
+    distance_to_leader: float
+    distance_to_team_above: float | None = None
 
 
 class IndividualStanding(BaseModel):

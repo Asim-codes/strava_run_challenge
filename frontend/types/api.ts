@@ -16,6 +16,8 @@ export type TeamStanding = {
   runners: string[];
   color: string;
   progress: number;
+  distance_to_leader: number;
+  distance_to_team_above: number | null;
 };
 
 export type IndividualStanding = {
