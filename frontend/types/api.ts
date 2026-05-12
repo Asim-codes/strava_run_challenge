@@ -55,6 +55,7 @@ export type CurrentChallengeResponse = {
 
 export type ArchivePeriod = {
   period: string;
+  label: string;
   total_distance: number;
   total_runs: number;
   active_runners: number;

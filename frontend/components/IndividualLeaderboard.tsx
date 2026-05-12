@@ -1,11 +1,20 @@
+"use client";
+
+import { useState } from "react";
 import { ProgressBar } from "@/components/ProgressBar";
 import type { IndividualStanding } from "@/types/api";
+
+const DEFAULT_VISIBLE = 10;
 
 type IndividualLeaderboardProps = {
   individuals: IndividualStanding[];
 };
 
 export function IndividualLeaderboard({ individuals }: IndividualLeaderboardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? individuals : individuals.slice(0, DEFAULT_VISIBLE);
+  const hasMore = individuals.length > DEFAULT_VISIBLE;
+
   return (
     <section className="section-card">
       <div className="section-heading">
@@ -13,11 +22,11 @@ export function IndividualLeaderboard({ individuals }: IndividualLeaderboardProp
           <p className="eyebrow">Solo chase</p>
           <h2>Top runners</h2>
         </div>
-        <span>Top {Math.min(individuals.length, 12)}</span>
+        <span>{individuals.length} runners</span>
       </div>
 
       <div className="ranking-list compact">
-        {individuals.slice(0, 12).map((runner) => (
+        {visible.map((runner) => (
           <article className="ranking-card" key={`${runner.runner}-${runner.team}`}>
             <div className="rank-badge">{runner.medal ?? runner.rank}</div>
             <div className="ranking-main">
@@ -33,16 +42,34 @@ export function IndividualLeaderboard({ individuals }: IndividualLeaderboardProp
                 {runner.streak_weeks > 0 && (
                   <span>{runner.streak_weeks} active weeks</span>
                 )}
-                {runner.badges.map((badge) => (
-                  <span className="soft-badge" key={badge}>
-                    {badge}
-                  </span>
-                ))}
               </div>
+              {runner.badges.length > 0 && (
+                <details className="badges-details">
+                  <summary>Badges ({runner.badges.length})</summary>
+                  <div className="badge-row">
+                    {runner.badges.map((badge) => (
+                      <span className="soft-badge" key={badge}>
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                </details>
+              )}
             </div>
           </article>
         ))}
       </div>
+
+      {hasMore && (
+        <button
+          className="view-more-btn"
+          onClick={() => setExpanded((prev) => !prev)}
+        >
+          {expanded
+            ? "Show less"
+            : `View ${individuals.length - DEFAULT_VISIBLE} more`}
+        </button>
+      )}
     </section>
   );
 }

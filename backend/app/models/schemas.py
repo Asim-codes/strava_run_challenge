@@ -58,6 +58,7 @@ class CurrentChallengeResponse(BaseModel):
 
 class ArchivePeriod(BaseModel):
     period: str
+    label: str
     total_distance: float
     total_runs: int
     active_runners: int

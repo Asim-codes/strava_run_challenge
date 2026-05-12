@@ -58,7 +58,7 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
           <select id="period" name="period" defaultValue={selectedPeriod}>
             {periods.map((period) => (
               <option key={period.period} value={period.period}>
-                {period.period}
+                {period.label}
               </option>
             ))}
           </select>

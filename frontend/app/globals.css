@@ -524,6 +524,60 @@ main {
   line-height: 1.25;
 }
 
+.badges-details {
+  margin-top: 6px;
+}
+
+.badges-details summary {
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+
+.badges-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.badges-details summary::before {
+  content: "▸";
+  font-size: 0.6rem;
+  transition: transform 0.15s;
+}
+
+.badges-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.badges-details .badge-row {
+  margin-top: 6px;
+}
+
+.view-more-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 0;
+  background: none;
+  border: 1px solid var(--border, rgba(0,0,0,0.1));
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.view-more-btn:hover {
+  background: rgba(0,0,0,0.03);
+}
+
 .badges-page .badges-rules {
   padding: 22px 24px 28px;
 }
